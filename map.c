@@ -1,47 +1,52 @@
 #include "map.h"
 
 int main(int argc, char **argv) {
-    if (argc < 7 || argc > 7) {
+    if (argc != 7) {
         printf("Not enough arguments !\n");
         return 1;
     }
-    if (!isdigit(*argv[1]) || !isdigit(*argv[2]) || !isdigit(*argv[5])) {
-        printf("Invalid arguments !\n");
-        return 1;
-    }
-    int l = atoi(argv[1]), c = atoi(argv[2]), op = atoi(argv[5]);
-    char e = *argv[3], o = *argv[4], f = *argv[6];
 
-    char **tab;
-    if (!(tab = calloc(l, sizeof(char*)))) {
-        printf("Allocation fail !\n");
-        return 1;
-    }
-    for (unsigned int i=0; i<l; i++) {
-        if (!(tab[i] = calloc(c, sizeof(char)))) {
-            printf("Allocation fail !\n");
+    char *endPtr[3];
+    long l = strtol(argv[1], &endPtr[0], 10);
+    long c = strtol(argv[2], &endPtr[1], 10);
+    long op = strtol(argv[5], &endPtr[2], 10);
+    for (unsigned int i=0; i<3; i++) {
+        if (*endPtr[i] != '\0') {
+            printf("Invalid arguments !\n");
             return 1;
         }
     }
+
+    char e = *argv[3], o = *argv[4], f = *argv[6];
+
+    char *line;
+    if (!(line = malloc((c+1)*sizeof(char)))) {
+        printf("Allocation fail !\n");
+        return 1;
+    }
+    line[c] = '\n';
+
+    FILE *ftpr;
+    ftpr = fopen("map.res", "w");
+    if (ftpr == NULL) {
+        printf("Can't open file !\n");
+        return 1;
+    }
+    fprintf(ftpr, "%ld%c%c%c\n", l, e, o, f);
 
     srand(time(NULL));
     for (unsigned int i=0; i<l; i++) {
         for (unsigned int j=0; j<c; j++) {
             if (rand()%100 > op) {
-                tab[i][j] = e;
+                line[j] = e;
             } else {
-                tab[i][j] = o;
+                line[j] = o;
             }
         }
-    }
-    printf("%d %c %c %c\n", l, e, o, f);
-    printf("%d %d\n", c, op);
-    for (unsigned int i=0; i<l; i++) {
-        for (unsigned int j=0; j<c; j++) {
-            printf("%c", tab[i][j]);
-        }
-        printf("\n");
+        fwrite(line, sizeof(char), c+1, ftpr);
     }
 
+    fclose(ftpr);
+    free(line);
     return 0;
 }
