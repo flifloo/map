@@ -35,8 +35,8 @@ int main(int argc, char **argv) {
     fprintf(ftpr, "%ld%c%c%c\n", l, e, o, f);
 
     srand(time(NULL));
-    for (unsigned int i=0; i<l; i++) {
-        for (unsigned int j=0; j<c; j++) {
+    for (unsigned long i=0; i<l; i++) {
+        for (unsigned long j=0; j<c; j++) {
             if (rand()%100 > op) {
                 line[j] = e;
             } else {
@@ -44,7 +44,10 @@ int main(int argc, char **argv) {
             }
         }
         fwrite(line, sizeof(char), c+1, ftpr);
+        fflush(stdout);
+        printf("\r%.0f%%", ((float)i/(float)l)*100);
     }
+    printf("\n");
 
     fclose(ftpr);
     free(line);
